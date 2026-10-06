@@ -311,7 +311,7 @@ bool PlannerServer::isCancelRequested(
 template<typename T>
 void PlannerServer::getPreemptedGoalIfRequested(
   std::unique_ptr<nav2_util::SimpleActionServer<T>> & action_server,
-  typename std::shared_ptr<const typename T::Goal> goal)
+  typename std::shared_ptr<const typename T::Goal> & goal)
 {
   if (action_server->is_preempt_requested()) {
     goal = action_server->accept_pending_goal();
