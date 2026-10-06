@@ -40,6 +40,7 @@
 
 #include <memory>
 #include <chrono>
+#include <limits>
 #include <string>
 #include <vector>
 #include <utility>
@@ -457,14 +458,25 @@ Costmap2DROS::getParameters()
 
   // 4. The width and height of map cannot be negative or 0 (to avoid abnoram memory usage)
   if (map_width_meters_ <= 0) {
-    RCLCPP_ERROR(
-      get_logger(), "You try to set width of map to be negative or zero,"
-      " this isn't allowed, please give a positive value.");
+    throw std::invalid_argument(
+            "You try to set width of map to be negative or zero, "
+            "this isn't allowed, please give a positive value.");
   }
   if (map_height_meters_ <= 0) {
-    RCLCPP_ERROR(
-      get_logger(), "You try to set height of map to be negative or zero,"
-      " this isn't allowed, please give a positive value.");
+    throw std::invalid_argument(
+            "You try to set height of map to be negative or zero, "
+            "this isn't allowed, please give a positive value.");
+  }
+  if (resolution_ <= 0.0) {
+    throw std::invalid_argument(
+            "Costmap resolution must be greater than zero.");
+  }
+
+  const double size_x = map_width_meters_ / resolution_;
+  const double size_y = map_height_meters_ / resolution_;
+  const double max_cells = std::numeric_limits<int>::max();
+  if (size_x > max_cells / size_y) {
+    throw std::invalid_argument("Costmap cell count exceeds the supported signed index range");
   }
 }
 
