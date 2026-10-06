@@ -21,6 +21,8 @@
 
 #include "nav_msgs/msg/occupancy_grid.hpp"
 #include "nav_msgs/msg/odometry.hpp"
+#include "nav2_msgs/msg/costmap.hpp"
+#include "nav2_msgs/msg/costmap_meta_data.hpp"
 #include "geometry_msgs/msg/pose_with_covariance_stamped.hpp"
 
 
@@ -55,6 +57,8 @@ bool validateMsg(const double & num)
   if (std::isnan(num)) {return false;}
   return true;
 }
+
+const double MIN_MAP_RESOLUTION = 1e-6;
 
 template<size_t N>
 bool validateMsg(const std::array<double, N> & msg)
@@ -169,6 +173,34 @@ bool validateMsg(const nav_msgs::msg::OccupancyGrid & msg)
   if (msg.data.size() != msg.info.width * msg.info.height) {
     return false;                                                          // check map-size
   }
+  return true;
+}
+
+bool validateMsg(const nav2_msgs::msg::CostmapMetaData & msg)
+{
+  if (!validateMsg(msg.origin)) {return false;}
+  if (!validateMsg(msg.resolution)) {return false;}
+
+  if (msg.resolution < MIN_MAP_RESOLUTION) {return false;}
+  if (msg.size_x == 0 || msg.size_y == 0) {return false;}
+
+  return true;
+}
+
+bool validateMsg(const nav2_msgs::msg::Costmap & msg)
+{
+  if (!validateMsg(msg.header)) {return false;}
+  if (!validateMsg(msg.metadata)) {return false;}
+
+  uint32_t num_cells;
+  if (__builtin_mul_overflow(msg.metadata.size_x, msg.metadata.size_y, &num_cells)) {
+    return false;
+  }
+
+  if (msg.data.size() != static_cast<size_t>(num_cells)) {
+    return false;
+  }
+
   return true;
 }
 
