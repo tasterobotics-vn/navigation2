@@ -138,7 +138,11 @@ ControllerServer::on_configure(const rclcpp_lifecycle::State & state)
   get_parameter("turning_look_ahead_range", turning_look_ahead_range_);
   get_parameter("turning_consider_percent", turning_consider_percent_);
 
-  costmap_ros_->configure();
+  if (costmap_ros_->configure().id() !=
+    lifecycle_msgs::msg::State::PRIMARY_STATE_INACTIVE)
+  {
+    return nav2_util::CallbackReturn::FAILURE;
+  }
   // Launch a thread to run the costmap node
   costmap_thread_ = std::make_unique<nav2_util::NodeThread>(costmap_ros_);
 

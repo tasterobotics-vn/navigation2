@@ -82,7 +82,11 @@ PlannerServer::on_configure(const rclcpp_lifecycle::State & state)
 {
   RCLCPP_INFO(get_logger(), "Configuring");
 
-  costmap_ros_->configure();
+  if (costmap_ros_->configure().id() !=
+    lifecycle_msgs::msg::State::PRIMARY_STATE_INACTIVE)
+  {
+    return nav2_util::CallbackReturn::FAILURE;
+  }
   costmap_ = costmap_ros_->getCostmap();
 
   if (!costmap_ros_->getUseRadius()) {
