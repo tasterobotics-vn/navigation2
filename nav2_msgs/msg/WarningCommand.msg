@@ -14,6 +14,7 @@ uint8 NAVIGATING=4
 uint8 GOAL_FAIL=5
 uint8 SET_VOLUME=6
 uint8 GOAL_CANCELED=7
+uint8 PERSON_DETECTED=8
 
 # Command to execute
 uint8 cmd
